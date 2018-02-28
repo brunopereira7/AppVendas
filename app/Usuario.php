@@ -16,4 +16,5 @@ class Usuario extends Model
         'senha_confirma',
         'grupo_liberacao_id'
     ];
+    protected $hidden = ['senha', 'senha_confirma'];
 }
