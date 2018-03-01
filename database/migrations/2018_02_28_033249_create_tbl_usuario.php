@@ -19,7 +19,6 @@ class CreateTblUsuario extends Migration
             $table->integer('cadastro_id')->unsigned();
             $table->string('login', 200);
             $table->string('senha', 200);
-            $table->string('senha_confirma', 200);
             $table->integer('grupo_liberacao_id')->unsigned();
             $table->timestamps();
         });

@@ -20,7 +20,7 @@ Route::group(array('prefix' => 'app'), function()
         return response()->json(['message' => 'AppVendas API', 'status' => 'Connected']);;
     });
 
-//    Route::resource('login', 'LoginController');
+    Route::resource('login', 'LoginController');
     @session_start();
 //    if (isset($_SESSION['login'])){
         Route::resource('empresa', 'EmpresaController');
