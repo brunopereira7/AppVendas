@@ -2,64 +2,65 @@
 
 namespace App\Http\Controllers;
 
+use App\Municipio;
 use Illuminate\Http\Request;
 
 class MunicipioController extends Controller
 {
     public function index()
     {
-        $usuario = Usuario::all();
-        return response()->json($usuario);
+        $municipio = Municipio::all();
+        return response()->json($municipio);
     }
     public function show($id)
     {
-        $usuario = Usuario::find($id);
+        $municipio = Municipio::find($id);
 
-        if(!$usuario) {
+        if(!$municipio) {
             return response()->json([
                 'message'   => 'Record not found',
             ], 404);
         }
 
-        return response()->json($usuario);
+        return response()->json($municipio);
     }
 
     public function store(Request $request)
     {
-        $usuario = new Usuario();
-        $usuario->fill($request->all());
-        $usuario->save();
+        $municipio = new Municipio();
+        $municipio->fill($request->all());
+        $municipio->save();
 
-        return response()->json($usuario, 201);
+        return response()->json($municipio, 201);
     }
 
     public function update(Request $request, $id)
     {
-        $usuario = Usuario::find($id);
+        $municipio = Municipio::find($id);
 
-        if(!$usuario) {
+        if(!$municipio) {
             return response()->json([
                 'message'   => 'Record not found',
             ], 404);
         }
 
-        $usuario->fill($request->all());
-        $usuario->save();
+        $municipio->fill($request->all());
+        $municipio->save();
 
-        return response()->json($usuario);
+        return response()->json($municipio);
     }
 
     public function destroy($id)
     {
-        $usuario = Usuario::find($id);
+        $municipio = Municipio::find($id);
 
-        if(!$usuario) {
+        if(!$municipio) {
             return response()->json([
                 'message'   => 'Record not found',
             ], 404);
         }
 
-        $usuario->delete();
+        $municipio->delete();
 
         return response()->json(['message'   => 'Deletado com sucesso!',], 200);
     }
