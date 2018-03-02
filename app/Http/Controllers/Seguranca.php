@@ -21,13 +21,17 @@ class Seguranca extends Controller
         $dados = base64_decode($dados);
         return $dados;
     }
-    function verificaRequest(String $dados,Boolean $criptografar, Boolean $maiusculo){
-        $dados = trim(addcslashes($dados));
-        if ($criptografar)
-            $dados = $this->criptPadrao($dados);
-        if ($maiusculo)
-            $dados = mb_strtoupper($dados,'UTF-8');
-
-        return $dados;
+    function verificaRequest($dados, $criptografar, $maiusculo){
+        $dados = trim(addslashes($dados));
+        if ($dados != null || $dados != '') {
+            if ($criptografar){
+                $dados = $this->criptPadrao($dados);
+            }
+            if ($maiusculo){
+                $dados = mb_strtoupper($dados, 'UTF-8');
+            }
+            return $dados;
+        }else
+            return null;
     }
 }

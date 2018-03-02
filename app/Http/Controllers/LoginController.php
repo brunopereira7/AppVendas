@@ -11,8 +11,7 @@ class LoginController extends Controller
         @session_start();
         //verifica se estou logado buscando dados da tabela de log de login
         if (isset($_SESSION['login'])){
-            $logLogin = new LogLoginController();
-            return $logLogin->show($_SESSION['login']);//retorna todos os dados do login atual (caso tenha feito login);
+            return response()->json(['conexao'=>$_SESSION['login']], 200);
         }else{
             return response()->json(null, 404);
         }

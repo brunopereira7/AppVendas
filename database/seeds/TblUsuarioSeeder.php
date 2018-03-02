@@ -22,6 +22,7 @@ class TblUsuarioSeeder extends Seeder
         ]);
 
         App\GrupoLiberacao::create([
+
             'id_empresa' => 1,
             'acesso_descricao' => 'ADM',
             'acesso_adm' => 'S',
