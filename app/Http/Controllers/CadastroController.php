@@ -148,8 +148,6 @@ class CadastroController extends Controller
             $request['cadastro_data'] = date("Y-m-d H:i:s");
         }
 
-        $request['cadastro_usuario'] = $_SESSION['conexao']['login'];
-
         $request['cpf_cnpj'] = $sec->verificaRequest($request['cpf_cnpj'], false, false);
         $request['cpf_cnpj'] = $sec->soNumero($request['cpf_cnpj']);
 
@@ -176,9 +174,7 @@ class CadastroController extends Controller
         $request['endereco_cep'] = $sec->verificaRequest($request['endereco_cep'], false, false);
         $request['endereco_cep'] = $sec->soNumero($request['endereco_cep']);
 
-
-
-
+        $request['cadastro_usuario'] = $_SESSION['conexao']['login'];
 
         $arrayReturn['data'] = $request;
         return $arrayReturn;

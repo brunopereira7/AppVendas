@@ -27,9 +27,14 @@ class EmpresaController extends Controller
 
         if (!$arrayReturn['erro']) {
             $empresa = new Empresa();
+            $sec = new Seguranca();
+
             $data = $arrayReturn['data'];
+            $data['cadastro_usuario_id'] = $sec->descriptPadrao($_SESSION['conexao']['id']);
+
             $empresa->fill($data->all());
             $empresa->save();
+
             return response()->json($empresa, 201);
         }else{
             $arrayReturn['data'] = null;
@@ -44,6 +49,7 @@ class EmpresaController extends Controller
         if (!$arrayReturn['erro']) {
             $data = $arrayReturn['data'];
             $empresa = Empresa::find($data['id']);
+
             if (!$empresa) {
                 return response()->json([
                     'message' => 'Record not found',
@@ -78,7 +84,6 @@ class EmpresaController extends Controller
         $sec = new Seguranca();
         $arrayReturn = array('erro' => false, 'campos' => '', 'data' => '');
 
-
         if (($request['ativo'] != null || $request['ativo'] != '') && ($request['ativo'] == 'N' || $request['ativo'] == 'S')) {
             $request['ativo'] = $sec->verificaRequest($request['ativo'], false, true);
         }else{
@@ -86,8 +91,47 @@ class EmpresaController extends Controller
             $arrayReturn['campos'] .= 'ativo|';
         }
 
+        if ($request['razao_social'] != null || $request['razao_social'] != '') {
+            $request['razao_social'] = $sec->verificaRequest($request['razao_social'], false, true);
+        }else{
+            $arrayReturn['erro'] = true;
+            $arrayReturn['campos'] .= 'razao_social|';
+        }
 
-        $arrayReturn['data'] = $request;
+        if (($request['pessoa_f_j'] != null || $request['pessoa_f_j'] != '') && ($request['pessoa_f_j'] == 'F' || $request['pessoa_f_j'] == 'J')) {
+            $request['pessoa_f_j'] = $sec->verificaRequest($request['pessoa_f_j'], false, true);
+        }else{
+            $arrayReturn['erro'] = true;
+            $arrayReturn['campos'] .= 'pessoa_f_j|';
+        }
+
+        if ($request['cadastro_data'] != null && $request['cadastro_data'] != '') {
+            $request['cadastro_data'] = $sec->verificaRequest($request['cadastro_data'], false, false);
+        }else{
+            $request['cadastro_data'] = date("Y-m-d H:i:s");
+        }
+
+        $request['nome_fantasia'] = $sec->verificaRequest($request['nome_fantasia'], false, true);
+        $request['cpf_cnpj'] = $sec->verificaRequest($request['cpf_cnpj'], false, false);
+        $request['cpf_cnpj'] = $sec->soNumero($request['cpf_cnpj']);
+        $request['rg_ssp'] = $sec->verificaRequest($request['rg_ssp'], false, true);
+        $request['inscricao_estadual'] = $sec->verificaRequest($request['inscricao_estadual'], false, true);
+        $request['telefone_principal'] = $sec->soNumero($request['telefone_principal']);
+        $request['telefone_um'] = $sec->soNumero($request['telefone_um']);
+        $request['email_principal'] = $sec->verificaRequest($request['email_principal'], false, true);
+        $request['pessoa_contato'] = $sec->verificaRequest($request['pessoa_contato'], false, true);
+        $request['endereco'] = $sec->verificaRequest($request['endereco'], false, true);
+        $request['endereco_numero'] = $sec->verificaRequest($request['endereco_numero'], false, true);
+        $request['endereco_complemento'] = $sec->verificaRequest($request['endereco_complemento'], false, true);
+        $request['endereco_bairro'] = $sec->verificaRequest($request['endereco_bairro'], false, true);
+        $request['endereco_municipio_cod'] = $sec->soNumero($request['endereco_municipio_cod']);
+        $request['endereco_cep'] = $sec->soNumero($request['endereco_cep']);
+        $request['endereco_cep'] = $sec->soNumero($request['endereco_cep']);
+        $request['cadastro_usuario'] = $_SESSION['conexao']['login'];
+        $request['licenca_software'] = $sec->verificaRequest($request['licenca_software'], false, true);
+        $request['cod_verificacao'] = $sec->verificaRequest($request['cod_verificacao'], false, true);
+        $request['observacao'] = $sec->verificaRequest($request['observacao'], false, true);
+
         return $arrayReturn;
 
     }
