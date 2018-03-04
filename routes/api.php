@@ -14,22 +14,26 @@ use Illuminate\Http\Request;
 */
 
 
-
 Route::get('/', function () {
     return response()->json(['message' => 'AppVendas API', 'status' => 'Connected']);;
 });
 
-Route::resource('login', 'LoginController');
 @session_start();
-$_SESSION['login'] = 0;
+Route::group(array('prefix' => 'login'), function() {
+
+    Route::get('/verifica_login', 'LoginController@index');
+    Route::get('/faz_login', 'LoginController@store');
+    Route::get('/faz_logoff', 'LoginController@destroy');
+});
+
 if (isset($_SESSION['login'])){
     Route::group(array('prefix' => 'empresa'), function() {
 
         Route::get('/all', 'EmpresaController@index');
-        Route::get('/id', 'EmpresaController@show');
-        Route::post('/new', 'EmpresaController@store');
-        Route::post('/edit', 'EmpresaController@update');
-        Route::get('/delete', 'EmpresaController@delete');
+        Route::get('/id/{id}', 'EmpresaController@show');
+        Route::get('/new', 'EmpresaController@store');
+        Route::get('/edit', 'EmpresaController@update');
+        Route::get('/delete/{id}', 'EmpresaController@destroy');
     });
 
     Route::group(array('prefix' => 'cadastro'), function() {
@@ -37,26 +41,25 @@ if (isset($_SESSION['login'])){
         Route::get('/all', 'CadastroController@index');
         Route::get('/id/{id}', 'CadastroController@show');
         Route::get('/new', 'CadastroController@store');
-        Route::post('/edit', 'CadastroController@update');
-        Route::get('/delete', 'CadastroController@delete');
+        Route::get('/edit', 'CadastroController@update');
+        Route::get('/delete/{id}', 'CadastroController@destroy');
     });
 
     Route::group(array('prefix' => 'grupo-liberacao'), function() {
 
         Route::get('/all', 'GrupoLiberacaoController@index');
-        Route::get('/id', 'GrupoLiberacaoController@show');
-        Route::post('/new', 'GrupoLiberacaoController@store');
-        Route::post('/edit', 'GrupoLiberacaoController@update');
-        Route::get('/delete', 'GrupoLiberacaoController@delete');
+        Route::get('/id/{id}', 'GrupoLiberacaoController@show');
+        Route::get('/new', 'GrupoLiberacaoController@store');
+        Route::get('/edit', 'GrupoLiberacaoController@update');
+        Route::get('/delete/{id}', 'GrupoLiberacaoController@destroy');
     });
 
 //    Route::group(array('prefix' => 'usuario'), function() {
-//
 //        Route::get('/all', 'UsuarioController@index');
-//        Route::get('/id', 'UsuarioController@show');
-//        Route::post('/new', 'UsuarioController@store');
-//        Route::post('/edit', 'UsuarioController@update');
-//        Route::get('/delete', 'UsuarioController@delete');
+//        Route::get('/id/{id}', 'UsuarioController@show');
+//        Route::get('/new', 'UsuarioController@store');
+//        Route::get('/edit', 'UsuarioController@update');
+//        Route::get('/delete/{id}', 'UsuarioController@destroy');
 //    });
 }
 

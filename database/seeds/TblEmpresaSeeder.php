@@ -21,8 +21,8 @@ class TblEmpresaSeeder extends Seeder
             'email_principal' => 'brunno.pereira7@gmail.com',
             'cadastro_usuario_id' => 1,
             'cadastro_usuario' => 'Seeder',
-            'licenca_software' => '',
-            'cod_verificacao' => ''
+            'licenca_software' => 'Vkc1d1ZrMXJNVlZXV0hCUFpXdFdNMVJWVWtKbFJUbEZXa1JvVGxkSVpEVlVWVkpHVGtWNFZWRlljRTFXUlVZMldtdFNTbVF3TVZWYU0xSk9Va1pHTUZSVlVrdFBSa1p6VTJ4YVZXRjZhRzVXVlZaWFZURktWbUpHVGxKWFNHUTFWRlZTUms1RmVGVlJXSEJOVmtWR05sTlZVa3BrTURseFUxUktVR0ZzUmpOYWExSkhUMFUxUlZSVVVrNVdSbkJ2VjJ4U1UyRXdPVVZhUjJ4UVZrVndjRlJXVW5KT1ZuQnhWVzB4V2sxc1JYaFVXSEJUWVZacmVWTllhRTloYkVVNQ==',
+            'cod_verificacao' => '43816ae4d87b92b199f4fcd534bcb164'
         ]);
     }
 }

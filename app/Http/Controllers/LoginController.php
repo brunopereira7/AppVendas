@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class LoginController extends Controller
 {
@@ -10,10 +11,11 @@ class LoginController extends Controller
     {
         @session_start();
         //verifica se estou logado buscando dados da tabela de log de login
+
         if (isset($_SESSION['login'])){
             return response()->json(['conexao'=>$_SESSION['login']], 200);
         }else{
-            return response()->json(null, 404);
+            return response()->json(['mensagem'=> 'Nenhum usuário localizado online nesse navegador.'], 404);
         }
     }
     public function store(Request $request)
@@ -33,7 +35,7 @@ class LoginController extends Controller
         if ($usuario){
             //cria histórico de login
             $arrayReturn = array(
-                'result' => criptPadrao($usuario->id),
+                'result' => $cript->criptPadrao($usuario->id),
                 'status' => 200
             );
             @session_start();
@@ -42,7 +44,6 @@ class LoginController extends Controller
 
         }
         else{
-
             @session_start();
             @session_unset();
             @session_destroy();
@@ -60,10 +61,11 @@ class LoginController extends Controller
         @session_start();
         //verifica se estou logado buscando dados da tabela de log de login
         if (isset($_SESSION['login'])){
-            $logLogin = new LogLoginController();
-            return $logLogin->destroy($_SESSION['login']);//retorna todos os dados do login atual (caso tenha feito login);
+            @session_destroy();
+            return response()->json(['mensagem' => 'Logoff realizado com sucesso.'], 200);
         }else{
-            return response()->json(null, 404);
+            @session_destroy();
+            return response()->json(['mensagem' => 'Usuário de login não encontrado.'], 404);
         }
     }
 }

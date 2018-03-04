@@ -21,7 +21,8 @@ class Seguranca extends Controller
         $dados = base64_decode($dados);
         return $dados;
     }
-    function verificaRequest($dados, $criptografar, $maiusculo){
+
+    public function verificaRequest($dados, $criptografar, $maiusculo){
         $dados = trim(addslashes($dados));
         if ($dados != null || $dados != '') {
             if ($criptografar){
@@ -33,5 +34,8 @@ class Seguranca extends Controller
             return $dados;
         }else
             return null;
+    }
+    public function soNumero($dados) {
+        return preg_replace("/[^0-9]/", "", $dados);
     }
 }
