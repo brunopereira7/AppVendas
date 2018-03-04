@@ -50,7 +50,7 @@ class CadastroController extends Controller
         if (!$arrayReturn['erro']) {
             $data = $arrayReturn['data'];
             $pessoa = Cadastro::find($data['id']);
-
+            $data['cadastro_usuario_id'] = $pessoa->cadastro_usuario_id;
 
             if (!$pessoa) {
                 return response()->json([

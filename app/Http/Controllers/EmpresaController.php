@@ -31,6 +31,8 @@ class EmpresaController extends Controller
 
             $data = $arrayReturn['data'];
             $data['cadastro_usuario_id'] = $sec->descriptPadrao($_SESSION['conexao']['id']);
+            $data['licenca_software'] = $sec->verificaRequest($request['licenca_software'], false, false);
+            $data['cod_verificacao'] = $sec->verificaRequest($request['cod_verificacao'], false, false);
 
             $empresa->fill($data->all());
             $empresa->save();
@@ -78,6 +80,34 @@ class EmpresaController extends Controller
         $empresa->ativo = 'N';
         $empresa->save();
         return response()->json(['message'   => 'Deletado com sucesso!',], 200);
+    }
+
+    public function atualizaLicenca(Request $request){
+
+        $sec = new Seguranca();
+
+        $data['licenca_software'] = $sec->verificaRequest($request['licenca_software'], false, false);
+        $data['id'] = $sec->verificaRequest($request['id'], false, false);
+
+
+        if (!$arrayReturn['erro']) {
+            $data = $arrayReturn['data'];
+            $empresa = Empresa::find($data['id']);
+
+            if (!$empresa) {
+                return response()->json([
+                    'message' => 'Record not found',
+                ], 404);
+            }
+            $empresa->fill($request->all());
+            $empresa->save();
+            return response()->json($empresa, 201);
+
+        }else{
+            $arrayReturn['data'] = null;
+            return response()->json($arrayReturn, 406);
+        }
+
     }
 
     public function validaEmpresa(Request $request){
@@ -128,10 +158,9 @@ class EmpresaController extends Controller
         $request['endereco_cep'] = $sec->soNumero($request['endereco_cep']);
         $request['endereco_cep'] = $sec->soNumero($request['endereco_cep']);
         $request['cadastro_usuario'] = $_SESSION['conexao']['login'];
-        $request['licenca_software'] = $sec->verificaRequest($request['licenca_software'], false, true);
-        $request['cod_verificacao'] = $sec->verificaRequest($request['cod_verificacao'], false, true);
         $request['observacao'] = $sec->verificaRequest($request['observacao'], false, true);
 
+        $arrayReturn['data'] = $request;
         return $arrayReturn;
 
     }
