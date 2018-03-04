@@ -12,8 +12,8 @@ class LoginController extends Controller
         @session_start();
         //verifica se estou logado buscando dados da tabela de log de login
 
-        if (isset($_SESSION['login'])){
-            return response()->json(['conexao'=>$_SESSION['login']], 200);
+        if (isset($_SESSION['conexao'])){
+            return response()->json(['conexao'=>$_SESSION['conexao']], 200);
         }else{
             return response()->json(['mensagem'=> 'Nenhum usuário localizado online nesse navegador.'], 404);
         }
@@ -39,7 +39,8 @@ class LoginController extends Controller
                 'status' => 200
             );
             @session_start();
-            $_SESSION['login'] = $arrayReturn['result'];
+            $_SESSION['conexao']['id'] = $cript->criptPadrao($usuario->id);
+            $_SESSION['conexao']['login'] = $usuario->login;
             return response()->json($arrayReturn,$arrayReturn['status']);
 
         }

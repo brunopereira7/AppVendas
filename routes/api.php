@@ -26,7 +26,7 @@ Route::group(array('prefix' => 'login'), function() {
     Route::get('/faz_logoff', 'LoginController@destroy');
 });
 
-if (isset($_SESSION['login'])){
+if (isset($_SESSION['conexao'])){
     Route::group(array('prefix' => 'empresa'), function() {
 
         Route::get('/all', 'EmpresaController@index');
