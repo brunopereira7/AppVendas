@@ -27,10 +27,16 @@ class CadastroController extends Controller
 
         if (!$arrayReturn['erro']) {
             $pessoa = new Cadastro();
+            $sec = new Seguranca();
+
             $data = $arrayReturn['data'];
+            $data['cadastro_usuario_id'] = $sec->descriptPadrao($_SESSION['conexao']['id']);
+
             $pessoa->fill($data->all());
             $pessoa->save();
+
             return response()->json($pessoa, 201);
+
         }else{
             $arrayReturn['data'] = null;
             return response()->json($arrayReturn, 406);
@@ -44,6 +50,8 @@ class CadastroController extends Controller
         if (!$arrayReturn['erro']) {
             $data = $arrayReturn['data'];
             $pessoa = Cadastro::find($data['id']);
+
+
             if (!$pessoa) {
                 return response()->json([
                     'message' => 'Record not found',
@@ -113,21 +121,21 @@ class CadastroController extends Controller
             $arrayReturn['campos'] .= 'listar_para_usuarios|';
         }
 
-        if (($request['eh_usuarios'] != null && $request['eh_usuarios'] != '') && ($request['eh_usuarios'] == 'S' || $request['eh_usuarios'] == 'N ')) {
+        if (($request['eh_usuarios'] != null && $request['eh_usuarios'] != '') && ($request['eh_usuarios'] == 'S' || $request['eh_usuarios'] == 'N')) {
             $request['eh_usuarios'] = $sec->verificaRequest($request['eh_usuarios'], false, true);
         }else{
             $arrayReturn['erro'] = true;
             $arrayReturn['campos'] .= 'eh_usuarios|';
         }
 
-        if (($request['eh_cliente'] != null && $request['eh_cliente'] != '') && ($request['eh_cliente'] == 'S' || $request['eh_cliente'] == 'N ')) {
+        if (($request['eh_cliente'] != null && $request['eh_cliente'] != '') && ($request['eh_cliente'] == 'S' || $request['eh_cliente'] == 'N')) {
             $request['eh_cliente'] = $sec->verificaRequest($request['eh_cliente'], false, true);
         }else{
             $arrayReturn['erro'] = true;
             $arrayReturn['campos'] .= 'eh_cliente|';
         }
 
-        if (($request['eh_fornecedor'] != null && $request['eh_fornecedor'] != '') && ($request['eh_fornecedor'] == 'S' || $request['eh_fornecedor'] == 'N ')) {
+        if (($request['eh_fornecedor'] != null && $request['eh_fornecedor'] != '') && ($request['eh_fornecedor'] == 'S' || $request['eh_fornecedor'] == 'N')) {
             $request['eh_fornecedor'] = $sec->verificaRequest($request['eh_fornecedor'], false, true);
         }else{
             $arrayReturn['erro'] = true;
@@ -141,7 +149,6 @@ class CadastroController extends Controller
         }
 
         $request['cadastro_usuario'] = $_SESSION['conexao']['login'];
-        $request['cadastro_usuario_id'] = $sec->descriptPadrao($_SESSION['conexao']['id']);
 
         $request['cpf_cnpj'] = $sec->verificaRequest($request['cpf_cnpj'], false, false);
         $request['cpf_cnpj'] = $sec->soNumero($request['cpf_cnpj']);
