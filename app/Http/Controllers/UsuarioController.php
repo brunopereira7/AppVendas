@@ -14,7 +14,9 @@ class UsuarioController extends Controller
     }
     public function show($id)
     {
-        $usuario = Usuario::find($id);
+        $sec = new Seguranca();
+        
+        $usuario = Usuario::find($sec->verificaRequest($id,false,false));
 
         if(!$usuario) {
             return response()->json([
@@ -24,22 +26,24 @@ class UsuarioController extends Controller
         return response()->json($usuario);
     }
 
-    public function create(Request $request)
+    public function store(Request $request)
     {
-        if ($request['senha'] == $request['senha_confirma'] && strpos($request['senha'], ' ')==0){
+        $arrayReturn = $this->validaUsuario($request);
+
+        if (!$arrayReturn['erro']) {
             $usuario = new Usuario();
-            $cript = new Seguranca();
-            $request['login'] = $cript->verificaRequest($request['login'],true,true);//previne sql injection e espaços
-            $request['senha'] = $cript->verificaRequest($request['senha'],true,false);//previne sql injection e espaços
-            $usuario->fill($request->all());
+            $sec = new Seguranca();
+
+            $data = $arrayReturn['data'];
+            $data['cadastro_usuario_id'] = $sec->descriptPadrao($_SESSION['conexao']['id']);
+
+            $usuario->fill($data->all());
             $usuario->save();
 
             return response()->json($usuario, 201);
-        }
-        else{
-            $arrayReturn = array(
-              'mensagem' => 'Informe os dados do usuário corretamente.'
-            );
+
+        }else{
+            $arrayReturn['data'] = null;
             return response()->json($arrayReturn, 406);
         }
 
@@ -47,16 +51,22 @@ class UsuarioController extends Controller
 
     public function update(Request $request)
     {
+        $arrayReturn = $this->validaCadastro($request);
 
-        if ($request['senha'] == $request['senha_confirma'] && strpos($request['senha'], ' ')==0){
-            $usuario = Usuario::find($request['id']);
+        if (!$arrayReturn['erro']){
+            $sec = new Seguranca();
+
+            $data = $arrayReturn['data'];
+            $usuario = Usuario::find($sec->verificaRequest($data['id'],false,false));
 
             if(!$usuario) {
                 return response()->json([
                     'message'   => 'Record not found = '.$request['id'],
                 ], 404);
             }
-
+            if ($request['senha'] == '********') {
+                $request['senha'] = $usuario->senha;
+            }
             $usuario->fill($request->all());
             $usuario->save();
 
@@ -70,4 +80,37 @@ class UsuarioController extends Controller
         }
     }
 
+    public function validaUsuario(Request $request){
+        $sec = new Seguranca();
+
+        $arrayReturn = array('erro' => false, 'campos' => '', 'data' => '');
+
+        if ($request['ativo'] ='S' || $request['ativo'] != 'N') {
+            $request['ativo'] = $sec->verificaRequest($request['ativo'], false, true);
+        }else{
+            $arrayReturn['erro'] = true;
+            $arrayReturn['campos'] .= 'ativo|';
+        }
+        
+        if (strpos($request['senha'], ' ')==0 && $request['senha'] != '********'){
+            $request['senha'] = $sec->verificaRequest($request['senha'],true,false);
+        }else{
+            $arrayReturn['erro'] = true;
+            $arrayReturn['campos'] .= 'senha|';
+        }
+        
+        if (strpos($request['login'], ' ')==0){
+            $request['login'] = $sec->verificaRequest($request['login'],true,true);
+        }else{
+            $arrayReturn['erro'] = true;
+            $arrayReturn['campos'] .= 'login|';
+        }
+
+        $request['cadastro_id'] = $sec->soNumero($request['cadastro_id']);
+        $request['grupo_liberacao_id'] = $sec->soNumero($request['grupo_liberacao_id']);
+
+
+        $arrayReturn['data'] = $request;
+        return $arrayReturn;
+    }
 }

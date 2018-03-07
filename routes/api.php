@@ -45,21 +45,21 @@ if (isset($_SESSION['conexao'])){
         Route::get('/delete/{id}', 'CadastroController@destroy');
     });
 
-    Route::group(array('prefix' => 'grupo-liberacao'), function() {
+    // Route::group(array('prefix' => 'grupo-liberacao'), function() {
 
-        Route::get('/all', 'GrupoLiberacaoController@index');
-        Route::get('/id/{id}', 'GrupoLiberacaoController@show');
-        Route::get('/new', 'GrupoLiberacaoController@store');
-        Route::get('/edit', 'GrupoLiberacaoController@update');
-        Route::get('/delete/{id}', 'GrupoLiberacaoController@destroy');
+    //     Route::get('/all', 'GrupoLiberacaoController@index');
+    //     Route::get('/id/{id}', 'GrupoLiberacaoController@show');
+    //     Route::get('/new', 'GrupoLiberacaoController@store');
+    //     Route::get('/edit', 'GrupoLiberacaoController@update');
+    //     Route::get('/delete/{id}', 'GrupoLiberacaoController@destroy');
+    // });
+ 
+   Route::group(array('prefix' => 'usuario'), function() {
+        Route::get('/all', 'UsuarioController@index');
+        Route::get('/id/{id}', 'UsuarioController@show');
+        Route::get('/new', 'UsuarioController@store');
+        Route::get('/edit', 'UsuarioController@update');
+        Route::get('/delete/{id}', 'UsuarioController@destroy');
     });
-
-//    Route::group(array('prefix' => 'usuario'), function() {
-//        Route::get('/all', 'UsuarioController@index');
-//        Route::get('/id/{id}', 'UsuarioController@show');
-//        Route::get('/new', 'UsuarioController@store');
-//        Route::get('/edit', 'UsuarioController@update');
-//        Route::get('/delete/{id}', 'UsuarioController@destroy');
-//    });
 }
 

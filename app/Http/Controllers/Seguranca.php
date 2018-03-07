@@ -25,11 +25,11 @@ class Seguranca extends Controller
     public function verificaRequest($dados, $criptografar, $maiusculo){
         $dados = trim(addslashes($dados));
         if ($dados != null || $dados != '') {
-            if ($criptografar){
-                $dados = $this->criptPadrao($dados);
-            }
             if ($maiusculo){
                 $dados = mb_strtoupper($dados, 'UTF-8');
+            }
+            if ($criptografar){
+                $dados = $this->criptPadrao($dados);
             }
             return $dados;
         }else
@@ -38,4 +38,5 @@ class Seguranca extends Controller
     public function soNumero($dados) {
         return preg_replace("/[^0-9]/", "", $dados);
     }
+
 }

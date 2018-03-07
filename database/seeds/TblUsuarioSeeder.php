@@ -16,8 +16,8 @@ class TblUsuarioSeeder extends Seeder
         App\Usuario::create([
             'ativo' => 'S',
             'cadastro_id' => '1',
-            'login' => $cript->criptPadrao('admin'),
-            'senha' => $cript->criptPadrao('ourocard'),
+            'login' => $cript->verificaRequest('admin',true,true),
+            'senha' => $cript->verificaRequest('ourocard',true,false),
             'grupo_liberacao_id' => '1'
         ]);
 

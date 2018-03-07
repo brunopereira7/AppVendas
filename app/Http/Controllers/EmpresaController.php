@@ -57,7 +57,12 @@ class EmpresaController extends Controller
                     'message' => 'Record not found',
                 ], 404);
             }
-            $empresa->fill($request->all());
+            
+            $data['cadastro_usuario_id'] = $empresa->cadastro_usuario_id;
+            $data['licenca_software'] = $empresa->licenca_software;
+            $data['cod_verificacao'] = $empresa->cod_verificacao;
+            
+            $empresa->fill($data->all());
             $empresa->save();
             return response()->json($empresa, 201);
 
