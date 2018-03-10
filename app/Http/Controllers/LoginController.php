@@ -13,9 +13,9 @@ class LoginController extends Controller
         //verifica se estou logado buscando dados da tabela de log de login
 
         if (isset($_SESSION['conexao'])){
-            return response()->json(['conexao'=>$_SESSION['conexao']['id'], 'conectado'=>true], 200);
+            return response()->json(['conexao'=>$_SESSION['conexao'], 'conectado'=>true], 200);
         }else{
-            return response()->json(['mensagem'=> 'Nenhum usuário localizado online nesse navegador.'], 404);
+            return response()->json(['mensagem'=> 'Nenhum usuário localizado online nesse navegador.', 'conectado'=>false], 404);
         }
     }
     public function store(Request $request)
@@ -30,6 +30,7 @@ class LoginController extends Controller
         $usuario = DB::table('tbl_usuario')
             ->where('login', $request['login'])
             ->where('senha', $request['senha'])
+            ->join('tbl_grupo_liberacao', 'tbl_usuario.grupo_liberacao_id', '=', 'tbl_grupo_liberacao.id')
             ->first();
 
         if ($usuario){
@@ -39,8 +40,10 @@ class LoginController extends Controller
                 'status' => 200
             );
             @session_start();
-            $_SESSION['conexao']['id'] = $cript->criptPadrao($usuario->id);
-            $_SESSION['conexao']['login'] = $usuario->login;
+            $usuario->id = $cript->criptPadrao($usuario->id);
+            $usuario->cadastro_id = $cript->criptPadrao($usuario->cadastro_id);
+            $usuario->grupo_liberacao_id = $cript->criptPadrao($usuario->grupo_liberacao_id);
+            $_SESSION['conexao'] = (array) $usuario;
             return response()->json($arrayReturn,$arrayReturn['status']);
 
         }

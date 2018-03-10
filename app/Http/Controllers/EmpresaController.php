@@ -87,33 +87,33 @@ class EmpresaController extends Controller
         return response()->json(['message'   => 'Deletado com sucesso!',], 200);
     }
 
-    public function atualizaLicenca(Request $request){
-
-        $sec = new Seguranca();
-
-        $data['licenca_software'] = $sec->verificaRequest($request['licenca_software'], false, false);
-        $data['id'] = $sec->verificaRequest($request['id'], false, false);
-
-
-        if (!$arrayReturn['erro']) {
-            $data = $arrayReturn['data'];
-            $empresa = Empresa::find($data['id']);
-
-            if (!$empresa) {
-                return response()->json([
-                    'message' => 'Record not found',
-                ], 404);
-            }
-            $empresa->fill($request->all());
-            $empresa->save();
-            return response()->json($empresa, 201);
-
-        }else{
-            $arrayReturn['data'] = null;
-            return response()->json($arrayReturn, 406);
-        }
-
-    }
+//    public function atualizaLicenca(Request $request){
+//
+//        $sec = new Seguranca();
+//
+//        $data['licenca_software'] = $sec->verificaRequest($request['licenca_software'], false, false);
+//        $data['id'] = $sec->verificaRequest($request['id'], false, false);
+//
+//
+//        if (!$arrayReturn['erro']) {
+//            $data = $arrayReturn['data'];
+//            $empresa = Empresa::find($data['id']);
+//
+//            if (!$empresa) {
+//                return response()->json([
+//                    'message' => 'Record not found',
+//                ], 404);
+//            }
+//            $empresa->fill($request->all());
+//            $empresa->save();
+//            return response()->json($empresa, 201);
+//
+//        }else{
+//            $arrayReturn['data'] = null;
+//            return response()->json($arrayReturn, 406);
+//        }
+//
+//    }
 
     public function validaEmpresa(Request $request){
         $sec = new Seguranca();
