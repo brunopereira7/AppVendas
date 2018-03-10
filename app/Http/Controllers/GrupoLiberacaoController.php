@@ -26,16 +26,12 @@ class GrupoLiberacaoController extends Controller
 
     public function store(Request $request)
     {
-        $arrayReturn = $this->validaEmpresa($request);
+        $arrayReturn = $this->validaLiberacao($request,false);
 
         if (!$arrayReturn['erro']) {
-            $liberacao = new Empresa();
-            $sec = new Seguranca();
+            $liberacao = new GrupoLiberacao();
 
             $data = $arrayReturn['data'];
-            $data['cadastro_usuario_id'] = $sec->descriptPadrao($_SESSION['conexao']['id']);
-            $data['licenca_software'] = $sec->verificaRequest($request['licenca_software'], false, false);
-            $data['cod_verificacao'] = $sec->verificaRequest($request['cod_verificacao'], false, false);
 
             $liberacao->fill($data->all());
             $liberacao->save();
@@ -49,7 +45,7 @@ class GrupoLiberacaoController extends Controller
 
     public function update(Request $request)
     {
-        $arrayReturn = $this->validaEmpresa($request);
+        $arrayReturn = $this->validaLiberacao($request,false);
 
         if (!$arrayReturn['erro']) {
             $data = $arrayReturn['data'];
@@ -60,11 +56,7 @@ class GrupoLiberacaoController extends Controller
                     'message' => 'Record not found',
                 ], 404);
             }
-            
-            $data['cadastro_usuario_id'] = $liberacao->cadastro_usuario_id;
-            $data['licenca_software'] = $liberacao->licenca_software;
-            $data['cod_verificacao'] = $liberacao->cod_verificacao;
-            
+
             $liberacao->fill($data->all());
             $liberacao->save();
             return response()->json($liberacao, 201);
@@ -75,100 +67,118 @@ class GrupoLiberacaoController extends Controller
         }
     }
 
-    public function destroy($id)
-    {
-        $sec = new Seguranca();
-        $liberacao = GrupoLiberacao::find($sec->verificaRequest($id,false,false));
+//    public function destroy($id)
+//    {
+//        $sec = new Seguranca();
+//        $liberacao = GrupoLiberacao::find($sec->verificaRequest($id,false,false));
+//
+//        if(!$liberacao) {
+//            return response()->json([
+//                'message'   => 'Record not found',
+//            ], 404);
+//        }
+//        $liberacao->ativo = 'N';
+//        $liberacao->save();
+//        return response()->json(['message'   => 'Deletado com sucesso!',], 200);
+//    }
 
-        if(!$liberacao) {
-            return response()->json([
-                'message'   => 'Record not found',
-            ], 404);
-        }
-        $liberacao->ativo = 'N';
-        $liberacao->save();
-        return response()->json(['message'   => 'Deletado com sucesso!',], 200);
-    }
-
-    public function atualizaLicenca(Request $request){
-
-        $sec = new Seguranca();
-
-        $data['licenca_software'] = $sec->verificaRequest($request['licenca_software'], false, false);
-        $data['id'] = $sec->verificaRequest($request['id'], false, false);
-
-
-        if (!$arrayReturn['erro']) {
-            $data = $arrayReturn['data'];
-            $liberacao = GrupoLiberacao::find($data['id']);
-
-            if (!$liberacao) {
-                return response()->json([
-                    'message' => 'Record not found',
-                ], 404);
-            }
-            $liberacao->fill($request->all());
-            $liberacao->save();
-            return response()->json($liberacao, 201);
-
-        }else{
-            $arrayReturn['data'] = null;
-            return response()->json($arrayReturn, 406);
-        }
-
-    }
-
-    public function validaEmpresa(Request $request){
+    public function validaLiberacao(Request $request, $vemDeUsuario){
         $sec = new Seguranca();
         $arrayReturn = array('erro' => false, 'campos' => '', 'data' => '');
-
-        if (($request['ativo'] != null || $request['ativo'] != '') && ($request['ativo'] == 'N' || $request['ativo'] == 'S')) {
-            $request['ativo'] = $sec->verificaRequest($request['ativo'], false, true);
+        if (!$vemDeUsuario)
+            $request_data = $request;
+        if(!$sec->ehNulo($request['id_empresa'])){
+            $request_data['id_empresa'] = $sec->soNumero($request['id_empresa']);
         }else{
             $arrayReturn['erro'] = true;
-            $arrayReturn['campos'] .= 'ativo|';
+            $arrayReturn['campos'] .= 'id_empresa|';
         }
-
-        if ($request['razao_social'] != null || $request['razao_social'] != '') {
-            $request['razao_social'] = $sec->verificaRequest($request['razao_social'], false, true);
+        if(!$sec->ehNulo($request['acesso_descricao'])){
+            $request_data['acesso_descricao'] = $sec->verificaRequest($request['acesso_descricao'],false,true);
         }else{
             $arrayReturn['erro'] = true;
-            $arrayReturn['campos'] .= 'razao_social|';
+            $arrayReturn['campos'] .= 'acesso_descricao|';
         }
-
-        if (($request['pessoa_f_j'] != null || $request['pessoa_f_j'] != '') && ($request['pessoa_f_j'] == 'F' || $request['pessoa_f_j'] == 'J')) {
-            $request['pessoa_f_j'] = $sec->verificaRequest($request['pessoa_f_j'], false, true);
+        if($sec->valida_s_n($request['acesso_adm'])){
+            $request_data['acesso_adm'] = $sec->verificaRequest($request['acesso_adm'],false,true);
         }else{
             $arrayReturn['erro'] = true;
-            $arrayReturn['campos'] .= 'pessoa_f_j|';
+            $arrayReturn['campos'] .= 'acesso_adm|';
         }
-
-        if ($request['cadastro_data'] != null && $request['cadastro_data'] != '') {
-            $request['cadastro_data'] = $sec->verificaRequest($request['cadastro_data'], false, false);
+        if($sec->valida_s_n($request['libera_cadastrar_pessoa'])){
+            $request_data['libera_cadastrar_pessoa'] = $sec->verificaRequest($request['libera_cadastrar_pessoa'],false,true);
         }else{
-            $request['cadastro_data'] = date("Y-m-d H:i:s");
+            $arrayReturn['erro'] = true;
+            $arrayReturn['campos'] .= 'libera_cadastrar_pessoa|';
+        }
+        if($sec->valida_s_n($request['libera_editar_pessoa'])){
+            $request_data['libera_editar_pessoa'] = $sec->verificaRequest($request['libera_editar_pessoa'],false,true);
+        }else{
+            $arrayReturn['erro'] = true;
+            $arrayReturn['campos'] .= 'libera_editar_pessoa|';
+        }
+        if($sec->valida_s_n($request['libera_deletar_pessoa'])){
+            $request_data['libera_deletar_pessoa'] = $sec->verificaRequest($request['libera_deletar_pessoa'],false,true);
+        }else{
+            $arrayReturn['erro'] = true;
+            $arrayReturn['campos'] .= 'libera_deletar_pessoa|';
+        }
+        if($sec->valida_s_n($request['libera_visualizar_pessoa'])){
+            $request_data['libera_visualizar_pessoa'] = $sec->verificaRequest($request['libera_visualizar_pessoa'],false,true);
+        }else{
+            $arrayReturn['erro'] = true;
+            $arrayReturn['campos'] .= 'libera_visualizar_pessoa|';
+        }
+        if($sec->valida_s_n($request['libera_venda_balcao'])){
+            $request_data['libera_venda_balcao'] = $sec->verificaRequest($request['libera_venda_balcao'],false,true);
+        }else{
+            $arrayReturn['erro'] = true;
+            $arrayReturn['campos'] .= 'libera_venda_balcao|';
+        }
+        if($sec->valida_s_n($request['libera_venda_pedido'])){
+            $request_data['libera_venda_pedido'] = $sec->verificaRequest($request['libera_venda_pedido'],false,true);
+        }else{
+            $arrayReturn['erro'] = true;
+            $arrayReturn['campos'] .= 'libera_venda_pedido|';
+        }
+        if($sec->valida_s_n($request['libera_venda_comanda'])){
+            $request_data['libera_venda_comanda'] = $sec->verificaRequest($request['libera_venda_comanda'],false,true);
+        }else{
+            $arrayReturn['erro'] = true;
+            $arrayReturn['campos'] .= 'libera_venda_comanda|';
+        }
+        if($sec->valida_s_n($request['libera_venda_desconto'])){
+            $request_data['libera_venda_desconto'] = $sec->verificaRequest($request['libera_venda_desconto'],false,true);
+        }else{
+            $arrayReturn['erro'] = true;
+            $arrayReturn['campos'] .= 'libera_venda_desconto|';
+        }
+        if($sec->valida_s_n($request['libera_venda_desconto_acima_teto'])){
+            $request_data['libera_venda_desconto_acima_teto'] = $sec->verificaRequest($request['libera_venda_desconto_acima_teto'],false,true);
+        }else{
+            $arrayReturn['erro'] = true;
+            $arrayReturn['campos'] .= 'libera_venda_desconto_acima_teto|';
+        }
+        if($sec->valida_s_n($request['visualiza_venda_propia'])){
+            $request_data['visualiza_venda_propia'] = $sec->verificaRequest($request['visualiza_venda_propia'],false,true);
+        }else{
+            $arrayReturn['erro'] = true;
+            $arrayReturn['campos'] .= 'visualiza_venda_propia|';
+        }
+        if($sec->valida_s_n($request['libera_venda_edita'])){
+            $request_data['libera_venda_edita'] = $sec->verificaRequest($request['libera_venda_edita'],false,true);
+        }else{
+            $arrayReturn['erro'] = true;
+            $arrayReturn['campos'] .= 'libera_venda_edita|';
+        }
+        if($sec->valida_s_n($request['libera_venda_cancela'])){
+            $request_data['libera_venda_cancela'] = $sec->verificaRequest($request['libera_venda_cancela'],false,true);
+        }else{
+            $arrayReturn['erro'] = true;
+            $arrayReturn['campos'] .= 'libera_venda_cancela|';
         }
 
-        $request['nome_fantasia'] = $sec->verificaRequest($request['nome_fantasia'], false, true);
-        $request['cpf_cnpj'] = $sec->verificaRequest($request['cpf_cnpj'], false, false);
-        $request['cpf_cnpj'] = $sec->soNumero($request['cpf_cnpj']);
-        $request['rg_ssp'] = $sec->verificaRequest($request['rg_ssp'], false, true);
-        $request['inscricao_estadual'] = $sec->verificaRequest($request['inscricao_estadual'], false, true);
-        $request['telefone_principal'] = $sec->soNumero($request['telefone_principal']);
-        $request['telefone_um'] = $sec->soNumero($request['telefone_um']);
-        $request['email_principal'] = $sec->verificaRequest($request['email_principal'], false, true);
-        $request['pessoa_contato'] = $sec->verificaRequest($request['pessoa_contato'], false, true);
-        $request['endereco'] = $sec->verificaRequest($request['endereco'], false, true);
-        $request['endereco_numero'] = $sec->verificaRequest($request['endereco_numero'], false, true);
-        $request['endereco_complemento'] = $sec->verificaRequest($request['endereco_complemento'], false, true);
-        $request['endereco_bairro'] = $sec->verificaRequest($request['endereco_bairro'], false, true);
-        $request['endereco_municipio_cod'] = $sec->soNumero($request['endereco_municipio_cod']);
-        $request['endereco_cep'] = $sec->soNumero($request['endereco_cep']);
-        $request['endereco_cep'] = $sec->soNumero($request['endereco_cep']);
-        $request['cadastro_usuario'] = $_SESSION['conexao']['login'];
-        $request['observacao'] = $sec->verificaRequest($request['observacao'], false, true);
-
-        $arrayReturn['data'] = $request;
+        $arrayReturn['data'] = $request_data;
         return $arrayReturn;
 
     }

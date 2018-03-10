@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\GrupoLiberacao;
 use App\Usuario;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class UsuarioController extends Controller
 {
@@ -16,7 +18,10 @@ class UsuarioController extends Controller
     {
         $sec = new Seguranca();
         
-        $usuario = Usuario::find($sec->verificaRequest($id,false,false));
+        $usuario = DB::table('tbl_usuario')
+            ->where('tbl_usuario.id', $sec->verificaRequest($id,false,false))
+            ->join('tbl_grupo_liberacao', 'tbl_usuario.grupo_liberacao_id', '=', 'tbl_grupo_liberacao.id')
+            ->first();
 
         if(!$usuario) {
             return response()->json([
@@ -33,11 +38,15 @@ class UsuarioController extends Controller
         if (!$arrayReturn['erro']) {
             $usuario = new Usuario();
             $sec = new Seguranca();
-
             $data = $arrayReturn['data'];
+            $liberacao = new GrupoLiberacaoController();
+            $returnLiberacao = $liberacao->validaLiberacao($request,true);
+
+
+
             $data['cadastro_usuario_id'] = $sec->descriptPadrao($_SESSION['conexao']['id']);
 
-            $usuario->fill($data->all());
+            $usuario->fill();
             $usuario->save();
 
             return response()->json($usuario, 201);

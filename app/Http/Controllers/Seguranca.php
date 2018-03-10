@@ -39,4 +39,25 @@ class Seguranca extends Controller
         return preg_replace("/[^0-9]/", "", $dados);
     }
 
+    public function valida_s_n($dados){
+        if ($dados == 'S' || $dados == 's' || $dados == 'N' || $dados == 'n')
+            return true;
+        else
+            false;
+    }
+
+    public function valida_f_j($dados){
+        if ($dados == 'F' || $dados == 'f' || $dados == 'J' || $dados == 'j')
+            return true;
+        else
+            false;
+    }
+
+    public function ehNulo($dados){
+        if ($dados == '' || $dados == null)
+            return true;
+        else
+            false;
+    }
+
 }
