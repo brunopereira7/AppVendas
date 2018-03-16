@@ -36,20 +36,31 @@ class UsuarioController extends Controller
         $arrayReturn = $this->validaUsuario($request);
 
         if (!$arrayReturn['erro']) {
+            $data = $arrayReturn['data'];
+
             $usuario = new Usuario();
             $sec = new Seguranca();
-            $data = $arrayReturn['data'];
+
             $liberacao = new GrupoLiberacaoController();
-            $returnLiberacao = $liberacao->validaLiberacao($request,true);
+
+            $liberacao_return = $liberacao->store($request);
 
 
 
-            $data['cadastro_usuario_id'] = $sec->descriptPadrao($_SESSION['conexao']['id']);
+            if($liberacao_return['erro'] == false){
+                $data['cadastro_usuario_id'] = $sec->descriptPadrao($_SESSION['conexao']['id']);
 
-            $usuario->fill();
-            $usuario->save();
+                $usuario->fill($data->all());
+                $usuario->save();
 
-            return response()->json($usuario, 201);
+                $liberacao = $liberacao_return['liberacao'];
+
+                return response()->json(['usuario'=>$usuario,'liberacao'=>$liberacao], 201);
+            }else{
+                $arrayReturn['data'] = null;
+//                $liberacao = (array) $liberacao;
+                return response()->json([$arrayReturn,$liberacao], 406);
+            }
 
         }else{
             $arrayReturn['data'] = null;
